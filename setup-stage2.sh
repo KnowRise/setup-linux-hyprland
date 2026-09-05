@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# KONfirmasi STAGE 1
+# Konfirmasi STAGE 1
 # ==========================================
 read -p "[?] Apakah kamu sudah menjalankan dan mereboot sistem dari Stage 1? (y/n): " confirm
 case "$confirm" in
@@ -13,6 +13,9 @@ case "$confirm" in
         exit 1
         ;;
 esac
+
+# Preparation
+REPO_DIR="$(pwd)"
 
 # ==========================================
 # 1. SYSTEM UTILITIES & DUAL-BOOT SETUP
@@ -34,6 +37,8 @@ if [ -f "xenlism-grub-arch-4k.tar.xz" ]; then
     cd xenlism-grub-arch-4k
     sudo ./install.sh
     cd ..
+    rm -rf xenlism-grub-arch-4k
+    echo "[+] Cleaned up Xenlism extraction folder."
 else
     echo "[!] Xenlism GRUB archive not found, skipping theme installation."
 fi
@@ -41,12 +46,16 @@ fi
 # ==========================================
 # 2. AUR HELPER & PACKAGE MANAGERS (YAY)
 # ==========================================
-echo "[+] Installing YAY AUR helper..."
+echo "[+] Installing YAY AUR helper in home directory..."
 sudo pacman -S --needed --noconfirm git base-devel
+cd ~
 if [ ! -d "yay" ]; then
     git clone https://aur.archlinux.org/yay.git
 fi
-cd yay && makepkg -si --noconfirm && cd ..
+cd yay && makepkg -si --noconfirm && cd ~
+
+# Kembali ke workdir repo awal
+cd "$REPO_DIR"
 
 echo "[+] Installing packages via pacman and yay..."
 yay -S --noconfirm aria2 visual-studio-code-bin
@@ -220,6 +229,8 @@ if [ -f "nier-automata.tar.gz" ]; then
 elif [ -d "nier-automata" ]; then
     sudo mkdir -p /usr/share/sddm/themes/nier-automata
     sudo cp -r nier-automata/* /usr/share/sddm/themes/nier-automata/
+    rm -rf nier-automata
+    echo "[+] Cleaned up nier-automata folder."
 fi
 
 sudo mkdir -p /etc/sddm.conf.d
