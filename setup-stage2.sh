@@ -1,10 +1,18 @@
 #!/bin/bash
 
 # ==========================================
-# 0. ML4W DOTFILES INSTALLER
+# KONfirmasi STAGE 1
 # ==========================================
-echo "[+] Installing ML4W Dotfiles..."
-bash <(curl -s https://ml4w.com/os/stable)
+read -p "[?] Apakah kamu sudah menjalankan dan mereboot sistem dari Stage 1? (y/n): " confirm
+case "$confirm" in
+    [yY][eE][sS]|[yY]) 
+        echo "[+] Melanjutkan ke konfigurasi sistem..."
+        ;;
+    *)
+        echo "[!] Batalkan eksekusi. Silakan jalankan ./setup-stage1.sh terlebih dahulu."
+        exit 1
+        ;;
+esac
 
 # ==========================================
 # 1. SYSTEM UTILITIES & DUAL-BOOT SETUP
@@ -112,6 +120,10 @@ sudo btrfs balance start -dusage=50 -dusage=85 /
 # ==========================================
 echo "[+] Applying custom configurations and ricing..."
 
+# Apply Custom Input Configuration (Natural Scroll = false)
+mkdir -p ~/.config/hypr
+cp configs/input.lua ~/.config/hypr/input.lua
+
 # Fastfetch Custom Config
 git clone https://github.com/douglasodev/fastfetch-custom-arch-linux.git ~/fastfetch-temp
 mkdir -p ~/.config/fastfetch
@@ -137,6 +149,9 @@ EOF
 
 # Force Waybar Theme to Minimal
 echo "/ml4w-minimal;/ml4w-minimal/config" > ~/.config/ml4w/settings/waybar-theme.sh
+
+# Apply Custom Dock Configuration (Enabled = false)
+cp configs/dock.json ~/.config/ml4w/settings/dock.json
 
 # Apply Custom Arch Linux Logo and Style for Waybar
 mkdir -p ~/.config/waybar/assets
