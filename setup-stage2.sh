@@ -79,7 +79,8 @@ rm -rf ~/mpv-config-temp
 # 4. GAMING & MULTIMEDIA
 # ==========================================
 echo "[+] Installing Steam and Lutris..."
-sudo pacman -S --noconfirm steam lutris
+sudo pacman -S steam
+sudo pacman -S --noconfirm lutris
 
 # Force Wayland/X11 driver for Steam (Global Replacement)
 mkdir -p ~/.local/share/applications
