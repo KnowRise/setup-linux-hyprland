@@ -1,0 +1,115 @@
+# ==========================================
+# 1. SYSTEM UTILITIES & DUAL-BOOT SETUP
+# ==========================================
+sudo pacman -S os-prober ntfs-3g
+sudo nvim /etc/default/grub
+# Ubah line "GRUB_DISABLE_OS_PROBER=false", pastikan tidak ada tanda "#"
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+# Ganti Grub Theme
+# Unpack file xenlism-grub-arch-4k.tar.xz
+# Jalankan ./install.sh
+
+# Enable Multilib Repository in Pacman
+# Change the config pacman, remove the "#" on multilib
+sudo pacman -Syu
+
+# Change Grub Theme
+# Unpack file xenlism-grub-arch-4k.tar.xz
+# running the ./install.sh
+
+# ==========================================
+# 2. AUR HELPER & PACKAGE MANAGERS (YAY)
+# ==========================================
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+
+yay -S aria2
+yay -S visual-studio-code-bin
+
+# ==========================================
+# 3. MULTIMEDIA, UTILITIES & PLAYERS
+# ==========================================
+sudo pacman -S mpv xclip
+
+# Setup MPV Config
+git clone git@github.com:noelsimbolon/mpv-config.git ~/mpv-config-temp
+mkdir -p ~/.config/mpv
+cp -r ~/mpv-config-temp/* ~/.config/mpv/
+rm -rf ~/mpv-config-temp
+
+# ==========================================
+# 4. GAMING & MULTIMEDIA
+# ==========================================
+sudo pacman -S steam
+sudo pacman -S lutris
+
+# Force Wayland/X11 driver for Steam
+mkdir -p ~/.local/share/applications
+cp /usr/share/applications/steam.desktop ~/.local/share/applications/
+sed -i 's|^Exec=/usr/bin/steam |Exec=env SDL_VIDEODRIVER=wayland,x11 /usr/bin/steam |g' ~/.local/share/applications/steam.desktop
+
+# ==========================================
+# 5. SYSTEM SNAPSHOTS & BACKUPS (SNAPPER)
+# ==========================================
+sudo nano /etc/snapper/configs/home
+sudo nano /etc/snapper/configs/root
+
+# Change Limit Snapper to
+TIMELINE_LIMIT_HOURLY="3"
+TIMELINE_LIMIT_DAILY="3"
+TIMELINE_LIMIT_WEEKLY="0"
+TIMELINE_LIMIT_MONTHLY="0"
+TIMELINE_LIMIT_QUARTERLY="0"
+TIMELINE_LIMIT_YEARLY="0"
+
+# Clear old snapshots
+sudo snapper -c home list
+sudo snapper -c root list
+sudo snapper -c home delete <range>
+sudo snapper -c root delete <range>
+
+# ==========================================
+# 6. RICE & ENVIRONMENT CUSTOMIZATION
+# ==========================================
+# Fastfetch Custom Config
+git clone https://github.com/douglasodev/fastfetch-custom-arch-linux.git ~/fastfetch-temp
+cp ~/fastfetch-temp/config.jsonc ~/.config/fastfetch/config.jsonc
+rm -rf ~/fastfetch-temp
+fastfetch
+
+# Wallpaper Setup
+cp cute-anime.jpg ~/.config/ml4w/wallpapers
+~/.config/ml4w/scripts/ml4w-wallpaper ~/.config/ml4w/wallpapers/cute-anime.jpg
+
+# Waybar Status Bar & Layout Settings
+cat << EOF > ~/.config/ml4w/settings/statusbar.json
+{
+    "bar": {
+        "enabled": false,
+        "alwaysExpanded": false,
+        "autohide": false
+    }
+}
+EOF
+
+# Force Waybar Theme to Minimal via CLI
+echo "/ml4w-minimal;/ml4w-minimal/config" > ~/.config/ml4w/settings/waybar-theme.sh
+
+# Apply Arch Linux Logo Asset for Waybar Custom Module
+cp ~/Downloads/archlinux.webp ~/.config/waybar/assets/
+
+# Update Waybar CSS to render the Arch Linux Webp Image Asset
+# (Make sure to configure #custom-ml4w-welcome background-image pointing to archlinux.webp in style.css)
+
+# ==========================================
+# 7. TERMINAL ENHANCEMENTS (ZSH PLUGINS)
+# ==========================================
+# Install Zsh autosuggestions and syntax highlighting via pacman
+sudo pacman -S zsh-autosuggestions zsh-syntax-highlighting
+
+# Register plugins in custom Zsh config
+echo "source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" >> ~/.zshrc_custom
+echo "source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ~/.zshrc_custom
